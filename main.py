@@ -21,12 +21,13 @@ Plan:
 """
 
 import string
+import random
 
 
 class LettersBag:
-    """Initialize the full bag of letters."""
-
+    """Represents the bag of letters."""
     def __init__(self):
+        self.bag_list = []
         self.all_letters = list(string.ascii_uppercase) + ['blank']
         self.letter_points = {0: ['blank'],
                               1: ['A', 'E', 'I', 'O', 'U', 'L', 'N', 'S', 'T', 'R'],
@@ -47,16 +48,41 @@ class LettersBag:
                                    12: ['E']
                                    }
 
-    def print_all_letters(self):
-        all_letters = []
+    def initialize_bag(self):
+        """Initialize the full bag of letters."""
         for freq, letters in self.letter_frequencies.items():
             for letter in letters:
                 for i in range(freq):
-                    all_letters.append(letter)
-        print(all_letters)
+                    self.bag_list.append(letter)
+        random.shuffle(self.bag_list)
+        print(self.bag_list, '\n')
+
+
+class Hand:
+    """Represents each player's hand."""
+    def __init__(self):
+        self.current_hand = []
+        self.letters_in_hand = len(self.current_hand)
+
+    def draw_letters(self, letters_bag):
+        if self.letters_in_hand < 7:
+            for i in range(7 - self.letters_in_hand):
+                letter = letters_bag.bag_list.pop(0)
+                self.current_hand.append(letter)
+
+    def print_hand(self):
+        print(self.current_hand)
 
 
 if __name__ == '__main__':
 
     new_bag = LettersBag()
-    new_bag.print_all_letters()
+    new_bag.initialize_bag()
+
+    first_hand = Hand()
+    first_hand.draw_letters(new_bag)
+    first_hand.print_hand()
+
+    second_hand = Hand()
+    second_hand.draw_letters(new_bag)
+    second_hand.print_hand()
