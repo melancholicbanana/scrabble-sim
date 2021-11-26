@@ -22,6 +22,7 @@ Plan:
 
 import string
 import random
+import re
 
 
 class LettersBag:
@@ -70,14 +71,17 @@ class Hand:
 
     def draw_letters(self, letters_bag):  # letters_bag should be an instance of the LettersBag class.
         """Draw letters from the bag."""
-        if self.letters_in_hand < 7:
-            for i in range(7 - self.letters_in_hand):
-                letter = letters_bag.bag_list.pop(0)
-                self.current_hand.append(letter)
+        for i in range(7 - self.letters_in_hand):
+            letter = letters_bag.bag_list.pop(0)
+            self.current_hand.append(letter)
 
     def print_hand(self):
         """Print the hand."""
         print(self.current_hand, '\n')
+
+    def shuffle_hand(self):
+        """Shuffles the hand."""
+        random.shuffle(self.current_hand)
 
 
 class Board:
@@ -132,10 +136,77 @@ class Board:
 
     def print_board(self):
         """Print the board."""
+        counter = 0
+        print("\t\t", end="")
+        for i in range(15):
+            if i <= 8:
+                print(str(i + 1) + "  ", end="")
+            else:
+                print(str(i + 1) + " ", end="")
+        print("\n")
         for row in self.board:
+            print(list(string.ascii_uppercase)[counter], end="\t\t")
+            counter += 1
             for item in row:
                 print(str(item) + "  ", end="")
             print(' ')
+        print("\n")
+
+
+class Player:
+    """Represents a player in the game."""
+
+    def __init__(self, name, hand):
+        """Initializes a player."""
+        self.name = name
+        self.hand = hand
+        self.score = 0
+
+
+def parse_position(position_str):
+    """Parses the entered position."""
+    pattern = "([A-O])([1-9][0-4]{0,1})(D|A)"
+    match = re.match(pattern, position_str)
+    try:
+        row = match.group(1)
+        column = match.group(2)
+        across_down = match.group(3)
+    except AttributeError:
+        print("Invalid position, try again!")
+    # Now a function to check that the positioning is valid.
+
+
+class Turn:
+    """Allows a player to take a turn."""
+
+    def __init__(self, current_board, player):
+        self.current_board = current_board
+        self.player = player
+
+        print(f"YOUR TURN: {player.name.upper()}. Enter '!' to quit at any time.\n")
+
+        while True:
+            quit_message = "\nYou have quit the game."
+            word = input("Word: ")
+            if word == '!':
+                print(quit_message)
+                break
+            position = input("Position (e.g. A1D): ")
+            if position == '!':
+                print(quit_message)
+            else:
+                parse_position(position)
+            break
+
+    # Things that happen in a turn:
+    # Call for input word
+    # Call for input position
+    # Check position is legal. If yes,
+    # Update board
+    # Remove from player hand
+    # Player draws new letters
+    # Calculate new player score
+    # Start new turn for different player
 
 
 if __name__ == '__main__':
@@ -152,3 +223,8 @@ if __name__ == '__main__':
 
     new_board = Board()
     new_board.print_board()
+
+    player_1 = Player("Oscar", first_hand)
+    player_2 = Player("Rose", second_hand)
+
+    new_turn = Turn(new_board, player_1)
