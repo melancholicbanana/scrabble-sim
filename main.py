@@ -123,16 +123,16 @@ class Board:
         ]
 
         for i in double_word_coords:
-            self.board[i[0]][i[1]] = 'w'
+            self.board[i[0]][i[1]] = '3'
 
         for j in triple_word_coords:
-            self.board[j[0]][j[1]] = 'W'
+            self.board[j[0]][j[1]] = '4'
 
         for a in double_letter_coords:
-            self.board[a[0]][a[1]] = 'l'
+            self.board[a[0]][a[1]] = '1'
 
         for b in triple_letter_coords:
-            self.board[b[0]][b[1]] = 'L'
+            self.board[b[0]][b[1]] = '2'
 
     def print_board(self):
         """Print the board."""
@@ -171,9 +171,47 @@ def parse_position(position_str):
         row = match.group(1)
         column = match.group(2)
         across_down = match.group(3)
+        print(list(string.ascii_uppercase).index(row), int(column), across_down)
+        return list(string.ascii_uppercase).index(row), int(column), across_down
     except AttributeError:
         print("Invalid position, try again!")
-    # Now a function to check that the positioning is valid.
+
+
+def check_position_validity(word, position_str, first_turn, board):
+    """Ensures the word fits on the board."""
+    row, column, across_down = parse_position(position_str)
+    word_length = len(word)
+    if across_down == 'D':
+        end_point = row + word_length - 1
+    else:
+        end_point = column + word_length - 1
+    if end_point > 14:
+        print("Word out of bounds!")
+
+    if first_turn:
+        pass  # Write something here for the first turn
+    else:
+        get_board_values = []
+        empty_tiles = ['4', '3', '2', '1', '-']
+        try:
+            for i in range(word_length):
+                if across_down == 'A':
+                    get_board_values.append(board.board[row][column + i - 1])
+                else:
+                    get_board_values.append(board.board[row + i][column - 1])
+            print(get_board_values)
+
+            print('BOARD VALUES SET', set(get_board_values))
+            print('EMPTY TILES SET', set(empty_tiles))
+            if all(item in set(empty_tiles) for item in get_board_values):
+                print("No connecting tiles. Try again!")
+            else:
+                print("Found connecting tile.")
+        except IndexError:
+            print("Word out of bounds!")
+
+    # Possible errors:
+    # Not connected to existing word (unless first turn)
 
 
 class Turn:
@@ -227,4 +265,8 @@ if __name__ == '__main__':
     player_1 = Player("Oscar", first_hand)
     player_2 = Player("Rose", second_hand)
 
-    new_turn = Turn(new_board, player_1)
+    # new_turn = Turn(new_board, player_1)
+
+    check_position_validity('Word', 'B1D', False, new_board)
+
+parse_position('A1A')
