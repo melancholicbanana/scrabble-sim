@@ -192,7 +192,7 @@ def check_position_validity(word, position_str, first_turn, board):
         pass  # Write something here for the first turn
     else:
         get_board_values = []
-        empty_tiles = ['4', '3', '2', '1', '-']
+        empty_tiles = ['4', '3', '2', '-']
         try:
             for i in range(word_length):
                 if across_down == 'A':
@@ -205,35 +205,82 @@ def check_position_validity(word, position_str, first_turn, board):
             print('EMPTY TILES SET', set(empty_tiles))
             if all(item in set(empty_tiles) for item in get_board_values):
                 print("No connecting tiles. Try again!")
+                return False
             else:
                 print("Found connecting tile.")
+                return True
         except IndexError:
             print("Word out of bounds!")
+            return False
 
     # Possible errors:
     # Not connected to existing word (unless first turn)
 
 
+def update_board(board, word, position_str):
+    """Updates the board with the new word,
+    skipping any tiles that are already full."""
+    word_length = len(word)
+    empty_tiles = ['4', '3', '2', '-']
+    row, column, across_down = parse_position(position_str)
+    for i in range(word_length):
+        if across_down == 'A':
+            successful = False
+            while not successful:
+                board_value = board.board[row][column + i - 1]
+                print('BOARD VALUE:', board_value, 'ROW:', row, 'COLUMN:', column + i - 1, 'i:', i, 'LETTER:',
+                      word[i].upper())
+                if board_value in empty_tiles:
+                    board.board[row][column + i - 1] = word[i].upper()
+                    print('LETTER PLACED SUCCESSFULLY')
+                    successful = True
+                else:
+                    print('SKIPPED COLUMN', str(column + i - 1), ", COLUMN IS NOW", column + i)
+                    column += 1
+        else:
+            successful = False
+            while not successful:
+                board_value = board.board[row + i][column - 1]
+                print('BOARD VALUE:', board_value, 'ROW:', row + i, 'COLUMN:', column - 1, 'i:', i, 'LETTER:',
+                      word[i].upper())
+                if board_value in empty_tiles:
+                    board.board[row + i][column - 1] = word[i].upper()
+                    print('LETTER PLACED SUCCESSFULLY')
+                    successful = True
+                else:
+                    print('SKIPPED ROW', str(row + i), ", ROW IS NOW", row + i + 1)
+                    row += 1
+
+    board.print_board()
+
+
 class Turn:
     """Allows a player to take a turn."""
 
-    def __init__(self, current_board, player):
+    def __init__(self, current_board, player, letters_bag):
         self.current_board = current_board
         self.player = player
+        self.word = ""
+        self.position = ""
+        self.current_bag = letters_bag
 
         print(f"YOUR TURN: {player.name.upper()}. Enter '!' to quit at any time.\n")
 
         while True:
             quit_message = "\nYou have quit the game."
-            word = input("Word: ")
-            if word == '!':
+            self.word = input("Word: ")
+            if self.word == '!':
                 print(quit_message)
                 break
-            position = input("Position (e.g. A1D): ")
-            if position == '!':
+            self.position = input("Position (e.g. A1D): ")
+            if self.position == '!':
                 print(quit_message)
             else:
-                parse_position(position)
+                valid = check_position_validity(self.word, self.position, False, self.current_board)
+                if valid:
+                    update_board(self.current_board, self.word, self.position)
+                    self.player.hand.draw_letters(letters_bag)
+                    self.player.hand.print_hand()
             break
 
     # Things that happen in a turn:
@@ -265,8 +312,7 @@ if __name__ == '__main__':
     player_1 = Player("Oscar", first_hand)
     player_2 = Player("Rose", second_hand)
 
-    # new_turn = Turn(new_board, player_1)
+    new_turn = Turn(new_board, player_1, new_bag)
 
-    check_position_validity('Word', 'B1D', False, new_board)
-
-parse_position('A1A')
+    # check_position_validity('Word', 'B1D', False, new_board)
+    # update_board(new_board, 'Word', 0, 1, 'D')
