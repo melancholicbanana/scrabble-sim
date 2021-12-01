@@ -31,16 +31,6 @@ class LettersBag:
     def __init__(self):
         self.bag_list = []
         self.all_letters = list(string.ascii_uppercase) + ['blank']
-        self.letter_points = {
-            0: ['blank'],
-            1: ['A', 'E', 'I', 'O', 'U', 'L', 'N', 'S', 'T', 'R'],
-            2: ['D', 'G'],
-            3: ['B', 'C', 'M', 'P'],
-            4: ['F', 'H', 'V', 'W', 'Y'],
-            5: ['K'],
-            8: ['J', 'X'],
-            10: ['Q', 'Z']
-        }
         self.letter_frequencies = {
             1: ['J', 'K', 'Q', 'X', 'Z'],
             2: ['B', 'C', 'F', 'H', 'M', 'P', 'V', 'W', 'Y', 'blank'],
@@ -167,8 +157,61 @@ class Player:
         self.hand = hand
         self.score = 0
 
-    def calculate_score(self):
-        pass
+    def calculate_score(self, word, board_values):
+        letter_points = {
+            0: ['blank'],
+            1: ['A', 'E', 'I', 'O', 'U', 'L', 'N', 'S', 'T', 'R'],
+            2: ['D', 'G'],
+            3: ['B', 'C', 'M', 'P'],
+            4: ['F', 'H', 'V', 'W', 'Y'],
+            5: ['K'],
+            8: ['J', 'X'],
+            10: ['Q', 'Z']
+        }
+        empty_tiles = ['4', '3', '2', '1', '-']
+        word_score = 0
+        skipped = 0
+        triple_word_score = 0
+        double_word_score = 0
+
+        def get_score_from_letter(letter):
+            for key, values in letter_points.items():
+                if letter in values:
+                    return key
+
+        for index, letter in enumerate(word):
+            board_value = board_values[index + skipped]
+            while board_value not in empty_tiles:
+                word_score += get_score_from_letter(board_value)  # For when the value is a connecting letter
+                print('FOUND CONNECTING LETTER:', board_value, 'REGULAR SCORE:', word_score)
+                skipped += 1
+                board_value = board_values[index + skipped]
+            if board_value == '1':  # Double letter score
+                word_score += get_score_from_letter(letter) * 2
+                print('DOUBLE LETTER SCORE ON "' + letter + '": ' + str(word_score))
+            elif board_value == '2':  # Triple letter score
+                word_score += get_score_from_letter(letter) * 3
+                print('TRIPLE LETTER SCORE ' + letter + ' ' + str(word_score))
+            elif board_value == '3':  # Double word score
+                double_word_score += 1
+                word_score += get_score_from_letter(letter)
+                print('DOUBLE WORD SCORE ' + letter + ' ' + str(word_score))
+            elif board_value == '4':  # Triple word score
+                triple_word_score += 1
+                word_score += get_score_from_letter(letter)
+                print('TRIPLE WORD SCORE ' + letter + ' ' + str(word_score))
+            else:
+                word_score += get_score_from_letter(letter)
+                print('REGULAR SCORE: ' + letter + ' ' + str(word_score))
+
+        for i in range(double_word_score):
+            word_score *= 2
+
+        for j in range(triple_word_score):
+            word_score *= 3
+
+        print('FINAL WORD SCORE:', word_score)
+        return word_score
 
 
 def parse_position(position_str):
@@ -239,12 +282,14 @@ def update_board(board, word, position_str):
     skipping any tiles that are already full."""
     word_length = len(word)
     empty_tiles = ['4', '3', '2', '-']
+    board_values = []
     row, column, across_down = parse_position(position_str)
     for i in range(word_length):
         if across_down == 'A':
             successful = False
             while not successful:
                 board_value = board.board[row][column + i - 1]
+                board_values.append(board_value)
                 print('BOARD VALUE:', board_value, 'ROW:', row, 'COLUMN:', column + i - 1, 'i:', i, 'LETTER:',
                       word[i].upper())
                 if board_value in empty_tiles:
@@ -258,6 +303,7 @@ def update_board(board, word, position_str):
             successful = False
             while not successful:
                 board_value = board.board[row + i][column - 1]
+                board_values.append(board_value)
                 print('BOARD VALUE:', board_value, 'ROW:', row + i, 'COLUMN:', column - 1, 'i:', i, 'LETTER:',
                       word[i].upper())
                 if board_value in empty_tiles:
@@ -267,8 +313,8 @@ def update_board(board, word, position_str):
                 else:
                     print('SKIPPED ROW', str(row + i), ", ROW IS NOW", row + i + 1)
                     row += 1
-
     board.print_board()
+    return board_values
 
 
 class Turn:
@@ -295,13 +341,14 @@ class Turn:
                 print(quit_message)
                 break
             else:
-                valid = check_position_validity(self.word, self.position, False, self.current_board, self.player.hand.current_hand)
+                valid = check_position_validity(self.word, self.position, False,
+                                                self.current_board, self.player.hand.current_hand)
                 if valid:
-                    update_board(self.current_board, self.word, self.position)
+                    board_values = update_board(self.current_board, self.word, self.position)
+                    print(board_values)
                     self.player.hand.place_word(self.word)
+                    self.player.calculate_score(self.word, board_values)
                     self.player.hand.draw_letters(self.current_bag)
-                    print('NEW HAND: ')
-                    self.player.hand.print_hand()
             break
 
     # Things that happen in a turn:
@@ -335,5 +382,6 @@ if __name__ == '__main__':
 
     new_turn = Turn(new_board, player_1, new_bag)
 
+    # player_1.calculate_score('WORD', ['-', '2', '4', 'L', '-'])
     # check_position_validity('Word', 'B1D', False, new_board)
     # update_board(new_board, 'Word', 0, 1, 'D')
