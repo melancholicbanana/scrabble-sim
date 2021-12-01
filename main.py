@@ -67,13 +67,18 @@ class Hand:
 
     def __init__(self):
         self.current_hand = []
-        self.letters_in_hand = len(self.current_hand)
 
     def draw_letters(self, letters_bag):  # letters_bag should be an instance of the LettersBag class.
         """Draw letters from the bag."""
-        for i in range(7 - self.letters_in_hand):
+        for i in range(7 - len(self.current_hand)):
             letter = letters_bag.bag_list.pop(0)
             self.current_hand.append(letter)
+
+    def place_word(self, word):
+        """Removes the letters in the word from the player's hand."""
+        for letter in word.upper():
+            self.current_hand.remove(letter)
+            print(self.current_hand)
 
     def print_hand(self):
         """Print the hand."""
@@ -162,6 +167,9 @@ class Player:
         self.hand = hand
         self.score = 0
 
+    def calculate_score(self):
+        pass
+
 
 def parse_position(position_str):
     """Parses the entered position."""
@@ -177,16 +185,25 @@ def parse_position(position_str):
         print("Invalid position, try again!")
 
 
-def check_position_validity(word, position_str, first_turn, board):
+def check_position_validity(word, position_str, first_turn, board, hand):
     """Ensures the word fits on the board."""
     row, column, across_down = parse_position(position_str)
     word_length = len(word)
+
+    for letter in word.upper():
+        if letter in hand:
+            continue
+        else:
+            print("Letters not in hand.")
+            return False
+
     if across_down == 'D':
         end_point = row + word_length - 1
     else:
         end_point = column + word_length - 1
     if end_point > 14:
         print("Word out of bounds!")
+        return False
 
     if first_turn:
         pass  # Write something here for the first turn
@@ -208,7 +225,7 @@ def check_position_validity(word, position_str, first_turn, board):
                 return False
             else:
                 print("Found connecting tile.")
-                return True
+                return True, hand
         except IndexError:
             print("Word out of bounds!")
             return False
@@ -265,6 +282,7 @@ class Turn:
         self.current_bag = letters_bag
 
         print(f"YOUR TURN: {player.name.upper()}. Enter '!' to quit at any time.\n")
+        self.player.hand.print_hand()
 
         while True:
             quit_message = "\nYou have quit the game."
@@ -275,11 +293,14 @@ class Turn:
             self.position = input("Position (e.g. A1D): ")
             if self.position == '!':
                 print(quit_message)
+                break
             else:
-                valid = check_position_validity(self.word, self.position, False, self.current_board)
+                valid = check_position_validity(self.word, self.position, False, self.current_board, self.player.hand.current_hand)
                 if valid:
                     update_board(self.current_board, self.word, self.position)
-                    self.player.hand.draw_letters(letters_bag)
+                    self.player.hand.place_word(self.word)
+                    self.player.hand.draw_letters(self.current_bag)
+                    print('NEW HAND: ')
                     self.player.hand.print_hand()
             break
 
@@ -300,11 +321,11 @@ if __name__ == '__main__':
 
     first_hand = Hand()
     first_hand.draw_letters(new_bag)
-    first_hand.print_hand()
+    # first_hand.print_hand()
 
     second_hand = Hand()
     second_hand.draw_letters(new_bag)
-    second_hand.print_hand()
+    # second_hand.print_hand()
 
     new_board = Board()
     new_board.print_board()
