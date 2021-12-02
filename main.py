@@ -385,3 +385,4 @@ if __name__ == '__main__':
     # player_1.calculate_score('WORD', ['-', '2', '4', 'L', '-'])
     # check_position_validity('Word', 'B1D', False, new_board)
     # update_board(new_board, 'Word', 0, 1, 'D')
+    # Test comment
