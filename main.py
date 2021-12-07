@@ -50,10 +50,7 @@ if __name__ == '__main__':
     # player_1.calculate_score('WORD', ['-', '2', '4', 'L', '-'])
     # check_position_validity('Word', 'A12A', False, new_board, ['W', 'O', 'R', 'D', 'A', 'A', 'A'])
     # get_board_values(new_board, 'Word', 'A1A')
-    update_board.update_board(new_board, 'Word', 'O12A')
-    """update_board is working except row O (across, any column) and column 15 (down, any column).
-    Other things to do:
-        - Dictionary checker
-        - Allow blanks to be any letter
+    update_board.update_board(new_board, 'Word', 'K15D')
+    """Other things to do:
         - Turn system"""
     # Test comment

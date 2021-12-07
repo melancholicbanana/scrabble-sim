@@ -4,7 +4,7 @@ import string
 
 def parse_position(position_str):
     """Parses the entered position."""
-    pattern = "([A-O])([1-9][0-4]{0,1})(D|A)"
+    pattern = "([A-O])([1-9][0-5]{0,1})(D|A)"
     match = re.match(pattern, position_str)
     try:
         row = match.group(1)
@@ -68,7 +68,16 @@ def check_position_validity(word, position_str, first_turn, board, hand):
         return False
 
     if first_turn:
-        pass  # Write something here for the first turn
+        row, column, across_down = parse_position(position_str)
+        if across_down == 'A' and row != 7:
+            print("Incorrect row for first turn.")
+            return False
+        elif across_down == 'D' and column != 7:
+            print("Incorrect column for first turn.")
+            return False
+        elif '3' not in board_values:
+            print("Middle tile not covered, try again.")
+            return False
     else:
         empty_tiles = ['4', '3', '2', '-']
         if all(item in set(empty_tiles) for item in board_values):  # Ensure there is a connecting tile
@@ -76,4 +85,42 @@ def check_position_validity(word, position_str, first_turn, board, hand):
             return False
         else:
             print("Found connecting tile.")
-            return True, hand
+            return True
+
+
+def assign_blanks(word):
+    """If a blank character is included in the word,
+    replaces it with a letter of the player's choice."""
+    if '#' in word:
+        for index, letter in enumerate(word):
+            if letter == '#':
+                successful = False
+                while not successful:
+                    new_letter = input("You have used a blank. Enter your preferred letter.")
+                    if len(new_letter) > 1:
+                        print("One character only, try again.")
+                    else:
+                        successful = True
+                        word[index] = new_letter
+    return word
+
+
+def check_dictionary(board, word, position_str):
+    """Checks if the word is in the SOWPODS dictionary."""
+    empty_tiles = ['4', '3', '2', '-']
+    board_values = get_board_values(board, word, position_str)
+    word_as_list = list(assign_blanks(word))
+    # print("LIST:", word_as_list)
+    for index, value in enumerate(board_values):
+        if value not in empty_tiles:
+            # print("VALUE:", value, "INDEX:", index)
+            word_as_list.insert(index, value)
+    full_word = "".join(word_as_list)
+    # print(full_word)
+
+    dictionary = open("sowpods.txt").read().splitlines()
+    if full_word.lower() in dictionary:
+        return full_word, True
+    else:
+        print("Word not in dictionary.\n")
+        return None, False

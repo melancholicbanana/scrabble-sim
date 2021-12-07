@@ -1,4 +1,4 @@
-from parse_check_position import check_position_validity
+from parse_check_position import check_position_validity, check_dictionary
 from calculate_score import calculate_score
 from update_board import update_board
 
@@ -10,6 +10,7 @@ class Turn:
         self.current_board = current_board
         self.player = player
         self.word = ""
+        self.full_word = ""
         self.position = ""
         self.current_bag = letters_bag
 
@@ -29,7 +30,8 @@ class Turn:
             else:
                 valid = check_position_validity(self.word, self.position, False,
                                                 self.current_board, self.player.hand.current_hand)
-                if valid:
+                full_word, in_dict = check_dictionary(self.current_board, self.word, self.position)
+                if valid and in_dict:
                     board_values = update_board(self.current_board, self.word, self.position)
                     print(board_values)
                     self.player.hand.place_word(self.word)
