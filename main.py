@@ -45,12 +45,29 @@ if __name__ == '__main__':
     player_1 = player.Player("Oscar", first_hand)
     player_2 = player.Player("Rose", second_hand)
 
+    first_turn = True
+    player = player_1
+    game_ongoing = True
+    new_turn = turn.Turn(new_board, new_bag, first_turn)
+    while game_ongoing:
+        new_board, new_bag, first_turn = new_turn.play(player)
+        if player == player_1:
+            player = player_2
+        else:
+            player = player_1
+        new_turn = turn.Turn(new_board, new_bag, first_turn)
+
     # new_turn = turn.Turn(new_board, player_1, new_bag)
 
     # player_1.calculate_score('WORD', ['-', '2', '4', 'L', '-'])
     # check_position_validity('Word', 'A12A', False, new_board, ['W', 'O', 'R', 'D', 'A', 'A', 'A'])
     # get_board_values(new_board, 'Word', 'A1A')
-    update_board.update_board(new_board, 'Word', 'K15D')
-    """Other things to do:
-        - Turn system"""
-    # Test comment
+    # update_board.update_board(new_board, 'Word', 'K15D')
+
+    """Things to do now:
+    Sort out the error/reprompt system, which currently just exits the game
+    Add end-game conditions
+    Add functionality for adding letters adjacently to an existing word. In this case,
+        there are no connecting tiles and the score for the previous word needs to be
+        recomputed with the adjacent tile added on.
+    """

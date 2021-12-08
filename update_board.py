@@ -5,7 +5,7 @@ def update_board(board, word, position_str):
     """Updates the board with the new word,
     skipping any tiles that are already full."""
     word_length = len(word)
-    empty_tiles = ['4', '3', '2', '-']
+    empty_tiles = ['4', '3', '2', '1', '-']
     board_values = get_board_values(board, word, position_str)
     row, column, across_down = parse_position(position_str)
     skipped = 0
@@ -33,4 +33,4 @@ def update_board(board, word, position_str):
                     # print('SKIPPED ROW', str(row + i + skipped), ", ROW IS NOW", row + i + skipped + 1)
                     skipped += 1
     board.print_board()
-    return board_values
+    return board, board_values

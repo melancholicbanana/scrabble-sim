@@ -6,3 +6,6 @@ class Player:
         self.name = name
         self.hand = hand
         self.score = 0
+
+    def print_score(self):
+        print('YOUR SCORE IS NOW:', self.score)

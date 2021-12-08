@@ -20,7 +20,7 @@ def get_board_values(board, word, position_str):
     row, column, across_down = parse_position(position_str)
     word_length = len(word)
     board_values = []
-    empty_tiles = ['4', '3', '2', '-']
+    empty_tiles = ['4', '3', '2', '1', '-']
 
     for i in range(word_length):
         if across_down == 'A':
@@ -78,14 +78,18 @@ def check_position_validity(word, position_str, first_turn, board, hand):
         elif '3' not in board_values:
             print("Middle tile not covered, try again.")
             return False
-    else:
-        empty_tiles = ['4', '3', '2', '-']
-        if all(item in set(empty_tiles) for item in board_values):  # Ensure there is a connecting tile
+
+    empty_tiles = ['4', '3', '2', '1', '-']
+    if all(item in set(empty_tiles) for item in board_values):  # Ensure there is a connecting tile
+        if not first_turn:
             print("No connecting tiles. Try again!")
             return False
         else:
-            print("Found connecting tile.")
+            print("First turn, no connecting tile needed.")
             return True
+    else:
+        print("Found connecting tile.")
+        return True
 
 
 def assign_blanks(word):
@@ -107,7 +111,7 @@ def assign_blanks(word):
 
 def check_dictionary(board, word, position_str):
     """Checks if the word is in the SOWPODS dictionary."""
-    empty_tiles = ['4', '3', '2', '-']
+    empty_tiles = ['4', '3', '2', '1', '-']
     board_values = get_board_values(board, word, position_str)
     word_as_list = list(assign_blanks(word))
     # print("LIST:", word_as_list)
@@ -120,6 +124,7 @@ def check_dictionary(board, word, position_str):
 
     dictionary = open("sowpods.txt").read().splitlines()
     if full_word.lower() in dictionary:
+        print("Word found in dictionary.\n")
         return full_word, True
     else:
         print("Word not in dictionary.\n")

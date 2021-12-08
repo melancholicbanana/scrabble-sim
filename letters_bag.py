@@ -7,10 +7,10 @@ class LettersBag:
 
     def __init__(self):
         self.bag_list = []
-        self.all_letters = list(string.ascii_uppercase) + ['blank']
+        self.all_letters = list(string.ascii_uppercase) + ['#']
         self.letter_frequencies = {
             1: ['J', 'K', 'Q', 'X', 'Z'],
-            2: ['B', 'C', 'F', 'H', 'M', 'P', 'V', 'W', 'Y', 'blank'],
+            2: ['B', 'C', 'F', 'H', 'M', 'P', 'V', 'W', 'Y', '#'],
             3: ['G'],
             4: ['D', 'L', 'S', 'U'],
             6: ['N', 'R', 'T'],

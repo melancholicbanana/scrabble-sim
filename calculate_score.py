@@ -2,7 +2,7 @@ def calculate_score(word, board_values):
     """Given a word and the tiles it was placed on,
     calculate the player's increase in score for this turn."""
     letter_points = {
-        0: ['blank'],
+        0: ['#'],
         1: ['A', 'E', 'I', 'O', 'U', 'L', 'N', 'S', 'T', 'R'],
         2: ['D', 'G'],
         3: ['B', 'C', 'M', 'P'],
