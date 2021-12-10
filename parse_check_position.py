@@ -13,6 +13,7 @@ def parse_position(position_str):
         return list(string.ascii_uppercase).index(row), int(column) - 1, across_down
     except AttributeError:
         print("Invalid position, try again!")
+        return None
 
 
 def get_board_values(board, word, position_str):
@@ -48,7 +49,7 @@ def get_board_values(board, word, position_str):
                     # print('SKIPPED ROW', str(row + i), ", ROW IS NOW", row + i + 1)
                     row += 1
 
-    print(word.upper(), board_values)
+    # print(word.upper(), board_values)
     return board_values
 
 
@@ -85,10 +86,10 @@ def check_position_validity(word, position_str, first_turn, board, hand):
             print("No connecting tiles. Try again!")
             return False
         else:
-            print("First turn, no connecting tile needed.")
+            # print("First turn, no connecting tile needed.")
             return True
     else:
-        print("Found connecting tile.")
+        # print("Found connecting tile.")
         return True
 
 
@@ -100,12 +101,14 @@ def assign_blanks(word):
             if letter == '#':
                 successful = False
                 while not successful:
-                    new_letter = input("You have used a blank. Enter your preferred letter.")
+                    new_letter = input("You have used a blank. Enter your preferred letter:")
                     if len(new_letter) > 1:
                         print("One character only, try again.")
                     else:
                         successful = True
-                        word[index] = new_letter
+                        word_as_list = list(word)
+                        word_as_list[index] = new_letter
+                        word = "".join(word_as_list)
     return word
 
 

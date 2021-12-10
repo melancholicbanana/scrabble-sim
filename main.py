@@ -40,7 +40,6 @@ if __name__ == '__main__':
     # second_hand.print_hand()
 
     new_board = board.Board()
-    new_board.print_board()
 
     player_1 = player.Player("Oscar", first_hand)
     player_2 = player.Player("Rose", second_hand)
@@ -50,12 +49,16 @@ if __name__ == '__main__':
     game_ongoing = True
     new_turn = turn.Turn(new_board, new_bag, first_turn)
     while game_ongoing:
-        new_board, new_bag, first_turn = new_turn.play(player)
+        try:
+            new_board, new_bag, first_turn = new_turn.play(player)
+        except TypeError:
+            break
         if player == player_1:
             player = player_2
         else:
             player = player_1
         new_turn = turn.Turn(new_board, new_bag, first_turn)
+        print(new_bag.bag_list)
 
     # new_turn = turn.Turn(new_board, player_1, new_bag)
 
@@ -66,7 +69,11 @@ if __name__ == '__main__':
 
     """Things to do now:
     Sort out the error/reprompt system, which currently just exits the game
-    Add end-game conditions
+    An invalid position in parse_position causes the game to exit
+    Add the bonus score for getting a full word in scrabble
+    Add end-game conditions:
+        - If the bag runs out of letters AND a player has no tiles left at the end of their turn
+        - If 5 consecutive turns are skipped
     Add functionality for adding letters adjacently to an existing word. In this case,
         there are no connecting tiles and the score for the previous word needs to be
         recomputed with the adjacent tile added on.

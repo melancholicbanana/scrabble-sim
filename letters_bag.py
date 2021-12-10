@@ -27,3 +27,9 @@ class LettersBag:
                     self.bag_list.append(letter)
         random.shuffle(self.bag_list)
         # print(self.bag_list, '\n')
+
+    def check_bag_empty(self):
+        if len(self.bag_list) == 0:
+            return True
+        else:
+            return False
